@@ -51,7 +51,7 @@ func main() {
 	router.Use(func(c *gin.Context) {
 		sessionToken := c.GetHeader("Authorization")
 		sessionToken = strings.TrimPrefix(sessionToken, "Bearer ")
-		_, err := client.VerifyToken(sessionToken) // This is a local operation, uses the clerk key to verify the token was make by clerk
+		claims, err := client.VerifyToken(sessionToken) // This is a local operation, uses the clerk key to verify the token was make by clerk
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": err,
@@ -59,11 +59,11 @@ func main() {
 			return
 		}
 
-		// user, err := client.Users().Read(claims.Subject)
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// fmt.Println("Welcome ", *user.FirstName)
+		user, err := client.Users().Read(claims.Subject)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Welcome ", *user.FirstName)
 
 		// fmt.Println("User ID", result.Subject)
 		// fmt.Println(client.Users().Read(result.Subject))
@@ -83,11 +83,11 @@ func main() {
 
 // getAlbums responds with the list of all albums as JSON.
 func getAlbums(c *gin.Context) {
-	sessionToken := c.Request.Header.Get("Authorization")
-	if sessionToken == "" {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
+	// sessionToken := c.Request.Header.Get("Authorization")
+	// if sessionToken == "" {
+	// 	c.AbortWithStatus(http.StatusUnauthorized)
+	// 	return
+	// }
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
